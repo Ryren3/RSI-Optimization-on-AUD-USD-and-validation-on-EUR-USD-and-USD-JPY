@@ -17,9 +17,9 @@ December 2022 to September 2025. The optimal threshold is found on the **AUD/USD
 
 ---
 
-## Methodology & Architectural Paradigms
+## Methodology 
 
-The study compares three distinct computational optimization paradigms:
+The study compares three distinct computational optimization methods:
 
 | Methodology | Optimization Type | Core Operational Mechanics |
 | :--- | :--- | :--- |
@@ -47,19 +47,19 @@ The RSI functions as a bounded momentum oscillator operating within a range of $
 
 ## Experimental Framework & Phase Analysis
 
-### 🔍 1. Exhaustive Grid Search Optimization
+###  1. Exhaustive Grid Search Optimization
 
 The parameter space was isolated to analyze non-linear return surfaces across a 676-combination matrix:
 * **Lower Threshold Boundary Layer:** Evaluated increments from $20$ to $45$.
 * **Upper Threshold Boundary Layer:** Evaluated increments from $65$ to $90$.
 * **Total Combinations:** $26 \times 26 = 676$ matrix iterations.
 
-#### 🏆 In-Sample Optimization Peak (AUD/USD Training)
+#### In-Sample Optimization Peak (AUD/USD Training)
 | Lower RSI | Upper RSI | Cumulative Return | Sharpe Ratio | Sortino Ratio | Max Drawdown |
 | :---: | :---: | :---: | :---: | :---: | :---: |
 | **21** | **77** | **31.70%** | **1.43** | **2.03** | **-7.40%** |
 
-#### 📉 Out-of-Sample Forward Performance Decay
+####  Out-of-Sample Forward Performance Decay
 | Metric | Forward Test Set Result |
 | :--- | :---: |
 | **Test Set Return** | 4.73% |
@@ -67,12 +67,8 @@ The parameter space was isolated to analyze non-linear return surfaces across a 
 | **Sortino Ratio** | 0.81 |
 | **Maximum Drawdown** | -7.99% |
 
-#### 📌 Quantitative Interpretation
+####  Quantitative Interpretation
 The stark compression in the Sharpe Ratio ($1.43 \rightarrow 0.57$) indicates **severe data over-fitting**. While the optimized $(21, 77)$ boundary retained marginal profitability out-of-sample, the return distribution surface flatten significantly, proving that exhaustive historical maximization captures fleeting structural patterns rather than persistent market inefficiencies.
-
-[Insert Grid Search Heatmap Here]
-Caption: Figure 1.1: Cumulative return topology across 676 RSI parameter combinations, demonstrating localized spikes in historical profitability.
-
 
 ---
 
@@ -81,7 +77,7 @@ Caption: Figure 1.1: Cumulative return topology across 676 RSI parameter combina
 To counteract static parameter decay, a rolling walk-forward framework was implemented to mirror live deployment conditions. 
 
 ####  Sliding Window Architecture
-* **In-Sample Training Sub-Window:** 6 Months (Parameter Selection)
+* **In-Sample Training Sub-Window:** 6 Months (Training or optimal threshold selection)
 * **Out-of-Sample Testing Sub-Window:** 3 Months (Forward Tracking)
 * **Total Evaluations:** 9 Sequential Rolling Iterations
 
@@ -108,7 +104,7 @@ To bypass window-specific overfitting, the dissertation aggregates rolling param
 **`RSI (24 / 75)`**. This smoothed configuration neutralizes short-term regime dependency and yields more reliable, low-variance baseline parameters.
 
 <img width="4470" height="4159" alt="image" src="https://github.com/user-attachments/assets/bdd69c20-70f9-4bdd-b4f0-50deffad50e3" />
-Figure 2.1: Equity curve progression and parameter drift across 9 distinct sliding validation windows.
+Figure 2.1: The training and testing results of all 9 windows.
 
 ---
 
@@ -146,7 +142,9 @@ The Q-Learning agent produced the weakest out-of-sample performance across all c
 <img width="3554" height="795" alt="image" src="https://github.com/user-attachments/assets/09832578-2f52-4782-a353-c9451fef9e74" />
 Figure 3.1: The optimal action state in each action state.
 
-Fig 3.1 shows the optimal action in each RSI state, higher the Q-value for each state under each action more likely that action is more suited in that state. State 0-10 is the best state for buying, as shown with a high q-value of 0.06. 
+Fig 3.1 shows the optimal action in each RSI state, higher the Q-value for each state under each action more likely that action is more suited in that state.
+
+The graph shows us that the  tate 0-10 is the best state for buying, as shown with a high q-value of 0.06. Selling is best at the state 60-70. 
 
 ---
 
@@ -160,11 +158,13 @@ The final model selection table compiles performance metrics recorded over ident
 | **Walk-Forward Framework** | 24 / 75 | +0.35% | 0.18 | 0.34 | -11.24% |
 | **Tabular Q-Learning Agent** | Adaptive Policy | -14.94% | -0.12 | -0.36 | -12.07% |
 
+Grid-search shows the best out-of-sample performance among the three models. Considering the high cumulative returns and other metrics. Walk-forward was follows grid-search and did significantly better than the RL model. Both the static models have positive returns, while the RL model produced a negative return (-14.94%). It's interesting that as the more complex the model is, the less superior is its performance. 
+
 ---
 
 ## Cross-Currency Stress Testing & Validation
 
-To test for geographical and asset-class generalizability, the top performing configuration derived from AUD/USD ($21 / 77$) was cross-validated on alternative, out-of-sample currency pairs:
+To test for geographical and asset-class generalizability, the top performing configuration derived from AUD/USD from the grid-search model ($21 / 77$) was cross-validated on alternative, out-of-sample currency pairs:
 
 | Target Pair | Validation Return | Sharpe Ratio | Sortino Ratio | Maximum Drawdown |
 | :--- | :---: | :---: | :---: | :---: |
